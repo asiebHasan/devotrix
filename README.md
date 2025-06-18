@@ -5,7 +5,7 @@
 !playwright install chromium
 ```
 
-## for Lexic
+## for Lexic(one Page)
 ```
 pip install pdfkit
 sudo apt install wkhtmltopdf  # or install via Windows/Mac installer
