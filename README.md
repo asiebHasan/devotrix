@@ -13,7 +13,7 @@ This application crawls websites, converts HTML pages to PDFs, downloads existin
 
 ## Requirements
 - Python 3.7+
-- Required packages: `playwright`, `beautifulsoup4`, `requests`, `apscheduler`
+- Required packages: `playwright`, `beautifulsoup4`, `requests`, `apscheduler`, `pdfkit`
 
 ## Installation
 1. Clone the repository:
@@ -26,6 +26,9 @@ cd devotrix
 ```bash
 pip install -r requirements.txt
 playwright install chromium
+
+pip install requests beautifulsoup4 pdfkit
+apt-get install wkhtmltopdf #download wkhtmltopdf for windows OS
 ```
 3. Edit the configuration  as needed.
 
