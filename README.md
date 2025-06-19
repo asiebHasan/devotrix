@@ -44,7 +44,8 @@ RATE_LIMIT_DELAY = 1.0
 Run the crawler:
 
 ```bash
-python fdix.py
+python fdic.py
+python lexic.py
 ```
 The application will:
 
