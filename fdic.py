@@ -1,335 +1,334 @@
 import os
 import re
 import time
+import json
+import logging
 import hashlib
-import random
-import threading
+import configparser
 from datetime import datetime
 from urllib.parse import urlparse, urljoin
+from concurrent.futures import ThreadPoolExecutor
 from playwright.sync_api import sync_playwright
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 from bs4 import BeautifulSoup
 
 # Configuration
+CONFIG_FILE = "crawler_config.ini"
 OUTPUT_DIR = "website_archives"
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-CRAWL_INTERVAL_HOURS = 12
-MAX_FILENAME_LENGTH = 180
-MAX_THREADS = 3
-PLAYWRIGHT_TIMEOUT = 2 * 60 * 1000 #in ms
+LOG_DIR = "crawler_logs"
+MAX_THREADS = 5
+MAX_DEPTH = 5
+RATE_LIMIT_DELAY = 1.0  # seconds between requests
 
-
-STEALTH_SCRIPTS = [
-    "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})",
-    "Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3]})",
-    "Object.defineProperty(navigator, 'languages', {get: () => ['en-US', 'en']})",
-    "window.navigator.chrome = {runtime: {}, app: {}};",
-    "const originalQuery = window.navigator.permissions.query; "
-    "window.navigator.permissions.query = (parameters) => "
-    "(parameters.name === 'notifications' ? "
-    "Promise.resolve({ state: Notification.permission }) : "
-    "originalQuery(parameters));"
-]
-
-
-thread_local = threading.local()
-
-def get_browser():
-    
-    if not hasattr(thread_local, "browser"):
-        pw = sync_playwright().start()
-        
-        
-        browser = pw.chromium.launch(
-            headless=True,
-            args=[
-                '--disable-blink-features=AutomationControlled',
-                '--disable-infobars',
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-web-security',
-                '--disable-features=IsolateOrigins,site-per-process'
-            ]
-        )
-        thread_local.browser = browser
-    return thread_local.browser
-
-def close_browser():
-
-    if hasattr(thread_local, "browser"):
-        thread_local.browser.close()
-        del thread_local.browser
-
-def create_stealth_context(browser):
-    
-    context = browser.new_context(
-        user_agent=USER_AGENT,
-        viewport={"width": 1366, "height": 768},
-        locale="en-US",
-        timezone_id="America/New_York",
-        java_script_enabled=True,
-        ignore_https_errors=True,
-        
-        extra_http_headers={
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.5",
-            "Connection": "keep-alive",
-            "Upgrade-Insecure-Requests": "1",
-            "Cache-Control": "max-age=0"
+# Setup configuration
+def setup_config():
+    config = configparser.ConfigParser()
+    if os.path.exists(CONFIG_FILE):
+        config.read(CONFIG_FILE)
+    else:
+        config['CRAWLER'] = {
+            'output_dir': OUTPUT_DIR,
+            'log_dir': LOG_DIR,
+            'max_threads': str(MAX_THREADS),
+            'max_depth': str(MAX_DEPTH),
+            'rate_limit_delay': str(RATE_LIMIT_DELAY),
+            'crawl_interval_hours': '12',
+            'skip_keywords': 'logout,admin,signout,register,login',
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
-    )
-    
-    
-    for script in STEALTH_SCRIPTS:
-        context.add_init_script(script)
-    
-    return context
+        with open(CONFIG_FILE, 'w') as configfile:
+            config.write(configfile)
+    return config
 
-def human_like_interaction(page):
-    
-    try:
-        
-        viewport_size = page.viewport_size
-        for _ in range(3):
-            x = random.randint(0, viewport_size["width"])
-            y = random.randint(0, viewport_size["height"])
-            page.mouse.move(x, y)
-            time.sleep(random.uniform(0.2, 0.5))
-        
-        
-        for _ in range(random.randint(1, 3)):
-            scroll_amount = random.randint(200, 800)
-            page.evaluate(f"window.scrollBy(0, {scroll_amount})")
-            time.sleep(random.uniform(0.5, 1.5))
-    except Exception:
-        pass  
+config = setup_config()
 
-def generate_filename(url, is_pdf=False):
-    
-    parsed = urlparse(url)
-    domain = re.sub(r"\W+", "_", parsed.netloc)
-    path = parsed.path.strip("/")
+# Create directories
+os.makedirs(config['CRAWLER']['output_dir'], exist_ok=True)
+os.makedirs(config['CRAWLER']['log_dir'], exist_ok=True)
 
-   
-    url_hash = hashlib.md5(url.encode()).hexdigest()[:8]
+# Setup logging
+def setup_logger():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = os.path.join(config['CRAWLER']['log_dir'], f"crawler_{timestamp}.log")
     
-    filename_base = "index" if not path else path.split("/")[-1].split("?")[0]
-    filename_base = re.sub(r"\W+", "_", filename_base)[:50]
+    logger = logging.getLogger("WebCrawler")
+    logger.setLevel(logging.INFO)
     
-    base_name = f"{domain}_{filename_base}_{url_hash}_{timestamp}"
+    # File handler
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
     
-    if len(base_name) > MAX_FILENAME_LENGTH:
-        keep_chars = MAX_FILENAME_LENGTH - len(url_hash) - len(timestamp) - 3
-        domain_part = domain[:keep_chars//2]
-        name_part = filename_base[:keep_chars - len(domain_part)]
-        base_name = f"{domain_part}_{name_part}_{url_hash}_{timestamp}"
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
     
-    return f"{base_name}.pdf"
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+    return logger
 
-def save_pdf(content, url, is_pdf=False):
-    
-    filename = generate_filename(url, is_pdf)
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    filepath = os.path.join(OUTPUT_DIR, filename)
-    
-    with open(filepath, "wb") as f:
-        f.write(content)
-    return filepath
+logger = setup_logger()
 
-def download_pdf(url):
-    try:
-        response = requests.get(
-            url,
-            headers={
-                "User-Agent": USER_AGENT,
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.5",
-                "Connection": "keep-alive"
-            },
-            timeout=30,
-            stream=True
-        )
-        if response.status_code == 200 and 'application/pdf' in response.headers.get('content-type', ''):
-            return save_pdf(response.content, url, is_pdf=True)
-        else:
-            print(f"Invalid PDF response for {url}: Status {response.status_code}")
-    except Exception as e:
-        print(f"PDF download failed for {url}: {str(e)}")
-    return None
-
-def html_to_pdf(url):
-    try:
-        browser = get_browser()
-        context = create_stealth_context(browser)
-        page = context.new_page()
+class WebCrawler:
+    def __init__(self, base_url):
+        self.base_url = base_url
+        self.base_domain = urlparse(base_url).netloc
+        self.visited = set()
+        self.pdf_checksums = set()
+        self.crawl_stats = {
+            'pages_crawled': 0,
+            'pdfs_found': 0,
+            'pdfs_downloaded': 0,
+            'errors': 0,
+            'skipped': 0
+        }
+        self.session = requests.Session()
+        self.skip_keywords = [kw.strip() for kw in config['CRAWLER']['skip_keywords'].split(',')]
+    
+    def should_skip(self, url):
+        """Check if URL should be skipped based on keywords"""
+        if any(kw in url.lower() for kw in self.skip_keywords):
+            return True
+        return False
+    
+    def generate_filename(self, url, is_pdf=False):
+        """Generate safe filename with domain, path, and timestamp"""
+        parsed = urlparse(url)
+        path = parsed.path.strip('/').replace('/', '_') or 'index'
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Generate hash for uniqueness
+        url_hash = hashlib.md5(url.encode()).hexdigest()[:6]
+        
+        # Remove special characters
+        clean_path = re.sub(r'[^\w\-]', '_', path)[:100]
+        filename = f"{self.base_domain}_{clean_path}_{url_hash}_{timestamp}.pdf"
+        return os.path.join(config['CRAWLER']['output_dir'], filename)
+    
+    def save_pdf(self, content, url, is_pdf=False):
+        """Save content to PDF file with deduplication"""
+        # Check for duplicates
+        content_hash = hashlib.md5(content).hexdigest()
+        if content_hash in self.pdf_checksums:
+            logger.info(f"Skipping duplicate content: {url}")
+            self.crawl_stats['skipped'] += 1
+            return None
+        
+        filename = self.generate_filename(url, is_pdf)
+        try:
+            with open(filename, "wb") as f:
+                f.write(content)
+            self.pdf_checksums.add(content_hash)
+            return filename
+        except Exception as e:
+            logger.error(f"Failed to save PDF: {str(e)}")
+            return None
+    
+    def download_pdf(self, url):
+        """Download existing PDF files"""
+        try:
+            response = self.session.get(
+                url,
+                headers={"User-Agent": config['CRAWLER']['user_agent']},
+                timeout=30,
+                stream=True
+            )
+            
+            if response.status_code == 200 and 'application/pdf' in response.headers.get('content-type', ''):
+                self.crawl_stats['pdfs_found'] += 1
+                if self.save_pdf(response.content, url, is_pdf=True):
+                    self.crawl_stats['pdfs_downloaded'] += 1
+                    logger.info(f"Downloaded PDF: {url}")
+                return True
+        except Exception as e:
+            logger.error(f"PDF download failed for {url}: {str(e)}")
+            self.crawl_stats['errors'] += 1
+        return False
+    
+    def html_to_pdf(self, url):
+        """Convert HTML page to PDF using headless browser"""
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch()
+                page = browser.new_page()
+                page.goto(url, wait_until="networkidle", timeout=60000)
+                
+                # Add delay for dynamic content
+                page.wait_for_timeout(2000)
+                
+                pdf_content = page.pdf()
+                browser.close()
+                
+                if self.save_pdf(pdf_content, url):
+                    logger.info(f"Generated PDF: {url}")
+                return True
+        except Exception as e:
+            logger.error(f"PDF generation failed for {url}: {str(e)}")
+            self.crawl_stats['errors'] += 1
+        return False
+    
+    def extract_links(self, url, html_content):
+        """Extract all valid links from HTML content"""
+        soup = BeautifulSoup(html_content, 'html.parser')
+        links = set()
+        
+        for link in soup.find_all('a', href=True):
+            href = link['href'].strip()
+            if not href or href.startswith(('mailto:', 'tel:', 'javascript:')):
+                continue
+            
+            # Normalize URL
+            absolute_url = urljoin(url, href)
+            parsed = urlparse(absolute_url)
+            
+            # Remove fragments and query parameters
+            clean_url = parsed._replace(fragment="", query="").geturl()
+            
+            # Filter by domain and skip keywords
+            if (parsed.netloc == self.base_domain and 
+                not self.should_skip(clean_url)):
+                links.add(clean_url)
+        
+        return links
+    
+    def process_url(self, url, depth=0):
+        """Process a single URL recursively"""
+        if (url in self.visited or 
+            depth > int(config['CRAWLER']['max_depth'])):
+            return []
+        
+        self.visited.add(url)
+        self.crawl_stats['pages_crawled'] += 1
+        logger.info(f"Processing [{depth}]: {url}")
+        
+        # Rate limiting
+        time.sleep(float(config['CRAWLER']['rate_limit_delay']))
         
         try:
-            # Add human-like delays
-            time.sleep(random.uniform(1.0, 3.0))
-            
-            # Navigate with realistic patterns
-            page.goto(url, wait_until="domcontentloaded", timeout=PLAYWRIGHT_TIMEOUT)
-            
-            # Simulate human interaction
-            human_like_interaction(page)
-            
-            # Wait for page to stabilize
-            page.wait_for_timeout(random.randint(2000, 5000))
-            
-            if page.query_selector("div.recaptcha"):
-                print("reCAPTCHA challenge detected. Skipping page.")
-                return None
-                
-            pdf_content = page.pdf()
-            return save_pdf(pdf_content, url)
-        except Exception as e:
-            print(f"PDF generation failed for {url}: {str(e)}")
-            return None
-        finally:
-            context.close()
-    except Exception as e:
-        print(f"Browser error for {url}: {str(e)}")
-        return None
-
-def extract_links(url, html_content):
-    soup = BeautifulSoup(html_content, 'html.parser')
-    base_domain = urlparse(url).netloc
-    links = set()
-
-    for link in soup.find_all('a', href=True):
-        href = link['href'].strip()
-        if not href or href.startswith(('mailto:', 'tel:', 'javascript:')):
-            continue
-
-        absolute_url = urljoin(url, href)
-        parsed = urlparse(absolute_url)
-        
-        clean_url = parsed._replace(fragment="", query="").geturl()
-        
-        if parsed.netloc == base_domain:
-            if clean_url.endswith('.pdf'):
-                links.add(clean_url)
-            else:
-                links.add(re.sub(r"/$", "", clean_url))
-
-    return links
-
-def process_url(url, visited, session, queue, lock):
-    if url in visited:
-        return
-    
-    with lock:
-        visited.add(url)
-    
-    print(f"Processing: {url}")
-
-    if url.endswith('.pdf'):
-        download_pdf(url)
-        return
-
-    try:
-        time.sleep(random.uniform(1.0, 5.0))
-        
-        response = session.get(
-            url,
-            headers={
-                "User-Agent": USER_AGENT,
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.5",
-                "Connection": "keep-alive"
-            },
-            timeout=30,
-            allow_redirects=True
-        )
-        
-        if response.status_code != 200:
-            print(f"Skipping {url}: Status {response.status_code}")
-            return
-
-        content_type = response.headers.get('content-type', '')
-        final_url = response.url
-
-        if 'application/pdf' in content_type:
-            download_pdf(final_url)
-        elif 'text/html' in content_type:
-            html_to_pdf(final_url)
-            
-            new_links = extract_links(final_url, response.content)
-            
-            # Add new links to queue
-            with lock:
-                for link in new_links:
-                    if link not in visited:
-                        queue.append(link)
-        else:
-            print(f"Skipping unsupported content at {url}: {content_type}")
-                
-    except Exception as e:
-        print(f"Error processing {url}: {str(e)}")
-
-def crawl_website(start_url):
-    visited = set()
-    queue = [start_url]
-    session = requests.Session()
-    lock = threading.Lock()
-    threads = []
-
-    while queue:
-        current_batch = []
-        while queue and len(current_batch) < MAX_THREADS:
-            url = queue.pop(0)
-            current_batch.append(url)
-        
-        for url in current_batch:
-            t = threading.Thread(
-                target=process_url,
-                args=(url, visited, session, queue, lock)
+            response = self.session.get(
+                url,
+                headers={"User-Agent": config['CRAWLER']['user_agent']},
+                timeout=30,
+                allow_redirects=True
             )
-            t.start()
-            threads.append(t)
+            
+            if response.status_code != 200:
+                logger.warning(f"Skipped {url}: Status {response.status_code}")
+                return []
+            
+            content_type = response.headers.get('content-type', '')
+            final_url = response.url
+            
+            # Handle PDF files
+            if 'application/pdf' in content_type or url.endswith('.pdf'):
+                self.download_pdf(final_url)
+                return []
+            
+            # Process HTML content
+            elif 'text/html' in content_type:
+                # Convert to PDF
+                self.html_to_pdf(final_url)
+                
+                # Extract and return new links
+                return self.extract_links(final_url, response.content)
         
-        for t in threads:
-            t.join()
-        threads.clear()
+        except Exception as e:
+            logger.error(f"Error processing {url}: {str(e)}")
+            self.crawl_stats['errors'] += 1
+        
+        return []
     
-    close_browser()
+    def crawl(self):
+        """Main crawl method with BFS implementation"""
+        logger.info(f"Starting crawl for: {self.base_url}")
+        queue = [(self.base_url, 0)]
+        
+        with ThreadPoolExecutor(max_workers=int(config['CRAWLER']['max_threads'])) as executor:
+            while queue:
+                futures = []
+                current_level = queue.copy()
+                queue = []
+                
+                for url, depth in current_level:
+                    future = executor.submit(self.process_url, url, depth)
+                    futures.append((future, depth))
+                
+                for future, depth in futures:
+                    new_links = future.result()
+                    for link in new_links:
+                        if link not in self.visited:
+                            queue.append((link, depth + 1))
+        
+        return self.crawl_stats
+
+def generate_report(stats):
+    """Generate JSON report of crawl statistics"""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    report = {
+        "timestamp": timestamp,
+        "crawl_stats": stats,
+        "websites": list(stats.keys())
+    }
+    
+    report_file = os.path.join(config['CRAWLER']['log_dir'], f"report_{timestamp}.json")
+    with open(report_file, 'w') as f:
+        json.dump(report, f, indent=2)
+    
+    return report_file
 
 def crawl_job():
+    """Main job to crawl both websites"""
+    logger.info("Starting crawl job")
+    start_time = time.time()
+    crawl_stats = {}
+    
     websites = [
         "https://www.fdic.gov/risk-management-manual-examination-policies",
-        # "https://advance.lexis.com/documentpage/?pdmfid=1000516&crid=e93b03e5-5b2e-489f-bf81-2c2cd5b24234&nodeid=AADAACAAD&nodepath=%2FROOT%2FAAD%2FAADAAC%2FAADAACAAD&level=3&haschildren=&populated=false&title=3-1-3.+Use+of+existing+forms+and+filings+relating+to+licenses+or+taxes.&config=00JAA1MDBlYzczZi1lYjFlLTQxTgtYWE3OS02YTgyOGM2NWJlMDYKAFBvZENhdGFsb2feed0oM9qoQOMCSJFX5qkd&pddocfullpath=%2Fshared%2Fdocument%2Fstatutes-legislation%2Furn%3AcontentItem%3A6348-FRF1-DYB7-W0N0-00008-00&ecomp=6gf59kk&prid=b73dd455-a3cc-405f-89ba-3d5d1f3acde9"
+        # Lexis URL (commented due to complexity)
+        # "https://advance.lexis.com/documentpage/?pdmfid=1000516&crid=e93b03e5-5b2e-489f-bf81-2c2cd5b24234&nodeid=AADAACAAD&nodepath=%2FROOT%2FAAD%2FAADAAC%2FAADAACAAD&level=3&haschildren=&populated=false&title=3-1-3.+Use+of+existing+forms+and+filings+relating+to+licenses+or+taxes.&config=00JAA1MDBlYzczZi1lYjFlLTQxMTgtYWE3OS02YTgyOGM2NWJlMDYKAFBvZENhdGFsb2feed0oM9qoQOMCSJFX5qkd&pddocfullpath=%2Fshared%2Fdocument%2Fstatutes-legislation%2Furn%3AcontentItem%3A6348-FRF1-DYB7-W0N0-00008-00&ecomp=6gf59kk&prid=b73dd455-a3cc-405f-89ba-3d5d1f3acde9"
     ]
-
+    
     for url in websites:
         try:
-            print(f"\nStarting crawl for: {url}")
-            parsed = urlparse(url)
-            clean_url = parsed._replace(query="").geturl()
-            crawl_website(clean_url)
+            crawler = WebCrawler(url)
+            stats = crawler.crawl()
+            crawl_stats[url] = stats
+            logger.info(f"Completed crawl for: {url}")
+            logger.info(f"Stats: {json.dumps(stats, indent=2)}")
         except Exception as e:
-            print(f"Critical error crawling {url}: {str(e)}")
+            logger.exception(f"Critical error crawling {url}: {str(e)}")
+    
+    # Generate report
+    report_file = generate_report(crawl_stats)
+    duration = time.time() - start_time
+    logger.info(f"Crawl job completed in {duration:.2f} seconds")
+    logger.info(f"Report generated: {report_file}")
 
 def setup_scheduler():
+    """Configure and start periodic scheduler"""
     scheduler = BackgroundScheduler()
+    interval_hours = int(config['CRAWLER']['crawl_interval_hours'])
+    
     scheduler.add_job(
         crawl_job,
         'interval',
-        hours=CRAWL_INTERVAL_HOURS,
+        hours=interval_hours,
         next_run_time=datetime.now()
     )
     scheduler.start()
-    print(f"Scheduler started. Will run every {CRAWL_INTERVAL_HOURS} hours.")
+    logger.info(f"Scheduler started. Running every {interval_hours} hours.")
     
     try:
         while True:
-            time.sleep(1)
+            time.sleep(3600)
     except (KeyboardInterrupt, SystemExit):
         scheduler.shutdown()
+        logger.info("Scheduler shut down")
 
 if __name__ == "__main__":
+    logger.info("Crawler application started")
+    
+    # Initial run
     crawl_job()
     
     # Start scheduled runs
