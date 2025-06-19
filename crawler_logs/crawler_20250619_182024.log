@@ -1,0 +1,21 @@
+2025-06-19 18:20:24,097 - INFO - Crawler application started
+2025-06-19 18:20:24,098 - INFO - Starting crawl job
+2025-06-19 18:20:24,098 - ERROR - Critical error crawling https://www.fdic.gov/risk-management-manual-examination-policies: 'WebCrawler' object has no attribute 'crawl'
+Traceback (most recent call last):
+  File "C:\Users\Cyber Expert\Desktop\New folder\devotrix\web_crawler_selenium.py", line 361, in crawl_job
+    stats = crawler.crawl()
+            ^^^^^^^^^^^^^
+AttributeError: 'WebCrawler' object has no attribute 'crawl'
+2025-06-19 18:20:24,099 - INFO - Crawl job completed in 0.00 seconds
+2025-06-19 18:20:24,100 - INFO - Report generated: ./crawler_logs\report_20250619_182024.json
+2025-06-19 18:20:24,111 - INFO - Scheduler started. Running every 12 hours.
+2025-06-19 18:20:24,111 - INFO - Starting crawl job
+2025-06-19 18:20:24,112 - ERROR - Critical error crawling https://www.fdic.gov/risk-management-manual-examination-policies: 'WebCrawler' object has no attribute 'crawl'
+Traceback (most recent call last):
+  File "C:\Users\Cyber Expert\Desktop\New folder\devotrix\web_crawler_selenium.py", line 361, in crawl_job
+    stats = crawler.crawl()
+            ^^^^^^^^^^^^^
+AttributeError: 'WebCrawler' object has no attribute 'crawl'
+2025-06-19 18:20:24,113 - INFO - Crawl job completed in 0.00 seconds
+2025-06-19 18:20:24,113 - INFO - Report generated: ./crawler_logs\report_20250619_182024.json
+2025-06-19 18:20:38,902 - INFO - Scheduler shut down

@@ -1,0 +1,68 @@
+2025-06-19 18:20:51,229 - INFO - Crawler application started
+2025-06-19 18:20:51,229 - INFO - Starting crawl job
+2025-06-19 18:20:51,230 - INFO - Starting crawl for: https://www.fdic.gov/risk-management-manual-examination-policies
+2025-06-19 18:20:51,230 - INFO - Processing [0]: https://www.fdic.gov/risk-management-manual-examination-policies
+2025-06-19 18:21:12,625 - INFO - Generated PDF: https://www.fdic.gov/risk-management-manual-examination-policies
+2025-06-19 18:21:12,668 - INFO - Processing [1]: https://www.fdic.gov/analysis/risk-review
+2025-06-19 18:21:12,668 - INFO - Processing [1]: https://www.fdic.gov/quarterly-banking-profile/fdic-quarterly-banking-profile-third-quarter-2024
+2025-06-19 18:21:12,669 - INFO - Processing [1]: https://www.fdic.gov/bank-examinations
+2025-06-19 18:21:12,669 - INFO - Processing [1]: https://www.fdic.gov/about
+2025-06-19 18:21:12,670 - INFO - Processing [1]: https://www.fdic.gov/about/board-directors-senior-executives
+2025-06-19 18:21:12,670 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25376
+2025-06-19 18:21:12,670 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153196
+2025-06-19 18:21:12,670 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153146
+2025-06-19 18:21:12,671 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25366
+2025-06-19 18:21:12,671 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25411
+2025-06-19 18:21:12,671 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153211
+2025-06-19 18:21:12,671 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153221
+2025-06-19 18:21:12,671 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153171
+2025-06-19 18:21:12,671 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153131
+2025-06-19 18:21:12,672 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153201
+2025-06-19 18:21:12,672 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153176
+2025-06-19 18:21:12,672 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153181
+2025-06-19 18:21:12,672 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25401
+2025-06-19 18:21:12,672 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25396
+2025-06-19 18:21:12,672 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25421
+2025-06-19 18:21:12,673 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153151
+2025-06-19 18:21:12,673 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25371
+2025-06-19 18:21:12,673 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153141
+2025-06-19 18:21:12,673 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/153136
+2025-06-19 18:21:12,673 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25381
+2025-06-19 18:21:12,673 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25406
+2025-06-19 18:21:12,673 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25386
+2025-06-19 18:21:12,674 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25391
+2025-06-19 18:21:12,674 - INFO - Skipping FDIC media URL: https://www.fdic.gov/media/25416
+2025-06-19 18:21:20,435 - INFO - Generated PDF: https://www.fdic.gov/quarterly-banking-profile/fdic-quarterly-banking-profile-third-quarter-2024
+2025-06-19 18:21:20,476 - INFO - Processing [1]: https://www.fdic.gov/resources
+2025-06-19 18:21:20,616 - INFO - Skipping duplicate content: https://www.fdic.gov/about/board-directors-senior-executives
+2025-06-19 18:21:20,653 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/manual-examinations-index.pdf
+2025-06-19 18:21:20,789 - INFO - Skipping duplicate content: https://www.fdic.gov/about
+2025-06-19 18:21:20,831 - INFO - Processing [1]: https://www.fdic.gov/about/open-government
+2025-06-19 18:21:20,970 - INFO - Skipping duplicate content: https://www.fdic.gov/bank-examinations
+2025-06-19 18:21:21,007 - INFO - Processing [1]: https://www.fdic.gov/quarterly-banking-profile/fdic-quarterly-banking-profile-second-quarter-2024
+2025-06-19 18:21:21,145 - INFO - Generated PDF: https://www.fdic.gov/analysis/risk-review
+2025-06-19 18:21:21,179 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/manual-examinations-toc.pdf
+2025-06-19 18:21:23,004 - INFO - Downloaded PDF: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/manual-examinations-index.pdf
+2025-06-19 18:21:23,005 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section18-1.pdf
+2025-06-19 18:21:23,341 - INFO - Downloaded PDF: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/manual-examinations-toc.pdf
+2025-06-19 18:21:23,341 - INFO - Processing [1]: https://www.fdic.gov/risk-management-manual-examination-policies/section-21-1-0
+2025-06-19 18:21:24,756 - INFO - Downloaded PDF: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section18-1.pdf
+2025-06-19 18:21:24,756 - INFO - Processing [1]: https://www.fdic.gov/financial-reports
+2025-06-19 18:21:29,098 - INFO - Generated PDF: https://www.fdic.gov/about/open-government
+2025-06-19 18:21:29,131 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section3-2.pdf
+2025-06-19 18:21:29,477 - INFO - Skipping duplicate content: https://www.fdic.gov/resources
+2025-06-19 18:21:29,513 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section5-1.pdf
+2025-06-19 18:21:29,625 - INFO - Skipping duplicate content: https://www.fdic.gov/financial-reports
+2025-06-19 18:21:29,658 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section4-1.pdf
+2025-06-19 18:21:29,780 - INFO - Skipping duplicate content: https://www.fdic.gov/quarterly-banking-profile/fdic-quarterly-banking-profile-second-quarter-2024
+2025-06-19 18:21:29,820 - INFO - Processing [1]: https://www.fdic.gov/about/about-ombudsman
+2025-06-19 18:21:31,466 - INFO - Downloaded PDF: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section5-1.pdf
+2025-06-19 18:21:31,467 - INFO - Processing [1]: https://www.fdic.gov/consumer-resource-center
+2025-06-19 18:21:35,487 - ERROR - PDF generation failed for https://www.fdic.gov/consumer-resource-center: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+2025-06-19 18:21:35,488 - ERROR - PDF generation failed for https://www.fdic.gov/about/about-ombudsman: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+2025-06-19 18:21:36,005 - INFO - Downloaded PDF: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section4-1.pdf
+2025-06-19 18:21:36,007 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section4-3.pdf
+2025-06-19 18:21:39,319 - INFO - Downloaded PDF: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section3-2.pdf
+2025-06-19 18:21:39,320 - INFO - Processing [1]: https://www.fdic.gov/espanol
+2025-06-19 18:21:40,000 - INFO - Downloaded PDF: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section4-3.pdf
+2025-06-19 18:21:40,000 - INFO - Processing [1]: https://www.fdic.gov/about/what-we-do

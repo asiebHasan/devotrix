@@ -19,7 +19,7 @@ OUTPUT_DIR = "website_archives"
 LOG_DIR = "crawler_logs"
 MAX_THREADS = 5
 MAX_DEPTH = 5
-RATE_LIMIT_DELAY = 1.0  # seconds between requests
+RATE_LIMIT_DELAY = 1.0  
 
 # Setup configuration
 def setup_config():

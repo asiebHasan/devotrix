@@ -1,0 +1,44 @@
+2025-06-19 18:16:30,453 - INFO - Crawler application started
+2025-06-19 18:16:30,453 - INFO - Starting crawl job
+2025-06-19 18:16:30,454 - INFO - Starting crawl for: https://www.fdic.gov/risk-management-manual-examination-policies
+2025-06-19 18:16:30,454 - INFO - Processing [0]: https://www.fdic.gov/risk-management-manual-examination-policies
+2025-06-19 18:16:32,778 - ERROR - PDF generation failed for https://www.fdic.gov/risk-management-manual-examination-policies: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-06-19 18:16:32,816 - INFO - Processing [1]: https://www.fdic.gov/center-financial-research
+2025-06-19 18:16:32,816 - INFO - Processing [1]: https://www.fdic.gov/quarterly-banking-profile/fdic-quarterly-banking-profile-third-quarter-2024
+2025-06-19 18:16:32,817 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section5-1.pdf
+2025-06-19 18:16:32,817 - INFO - Processing [1]: https://www.fdic.gov/media/25376
+2025-06-19 18:16:32,818 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section4-5.pdf
+2025-06-19 18:16:34,021 - INFO - Downloaded PDF: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section5-1.pdf
+2025-06-19 18:16:34,021 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/2024-01-updates.zip
+2025-06-19 18:16:35,090 - INFO - Processing [1]: https://www.fdic.gov/news/press-releases/2025/fdic-insured-institutions-reported-return-assets-111-percent-and-net
+2025-06-19 18:16:35,132 - INFO - Downloaded PDF: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section4-5.pdf
+2025-06-19 18:16:35,132 - INFO - Processing [1]: https://www.fdic.gov/news/videos
+2025-06-19 18:16:35,138 - ERROR - PDF generation failed for https://www.fdic.gov/quarterly-banking-profile/fdic-quarterly-banking-profile-third-quarter-2024: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-06-19 18:16:35,174 - INFO - Processing [1]: https://www.fdic.gov/news/events
+2025-06-19 18:16:35,192 - ERROR - PDF generation failed for https://www.fdic.gov/center-financial-research: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-06-19 18:16:35,230 - INFO - Processing [1]: https://www.fdic.gov/international-affairs/international-seminars
+2025-06-19 18:16:37,900 - ERROR - PDF generation failed for https://www.fdic.gov/news/press-releases/2025/fdic-insured-institutions-reported-return-assets-111-percent-and-net: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-06-19 18:16:37,929 - INFO - Processing [1]: https://www.fdic.gov/media/25381
+2025-06-19 18:16:37,930 - ERROR - PDF generation failed for https://www.fdic.gov/news/videos: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-06-19 18:16:37,964 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section17-2.pdf
+2025-06-19 18:16:38,136 - ERROR - PDF generation failed for https://www.fdic.gov/news/events: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-06-19 18:16:38,162 - INFO - Processing [1]: https://www.fdic.gov/media/153141
+2025-06-19 18:16:38,466 - ERROR - PDF generation failed for https://www.fdic.gov/international-affairs/international-seminars: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-06-19 18:16:38,510 - INFO - Processing [1]: https://www.fdic.gov/about/contact-fdic
+2025-06-19 18:16:41,461 - ERROR - PDF generation failed for https://www.fdic.gov/about/contact-fdic: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-06-19 18:16:41,502 - INFO - Processing [1]: https://www.fdic.gov/quarterly-banking-profile/fdic-quarterly-banking-profile-second-quarter-2024
+2025-06-19 18:16:42,756 - INFO - Downloaded PDF: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section17-2.pdf
+2025-06-19 18:16:42,756 - INFO - Processing [1]: https://www.fdic.gov/media/25391
+2025-06-19 18:16:42,808 - ERROR - PDF generation failed for https://www.fdic.gov/quarterly-banking-profile/fdic-quarterly-banking-profile-second-quarter-2024: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-06-19 18:16:42,839 - INFO - Processing [1]: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section18-1.pdf
+2025-06-19 18:16:44,882 - INFO - Downloaded PDF: https://www.fdic.gov/resources/supervision-and-examinations/examination-policies-manual/section18-1.pdf
+2025-06-19 18:16:44,882 - INFO - Processing [1]: https://www.fdic.gov/media/25396
